@@ -1,16 +1,35 @@
-const { Client, Intents } = require('discord.js');
+// Modules import
+const { Client, Intents, Collection } = require('discord.js');
+const Config = require('./config.json');
+const fs = require('fs');
 
-const bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
+// Client (Bot) creation & intents selection
+const Bot = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES] });
 
-bot.once('ready', () => {
+// Importing commands handler from './Commands/'
+Bot.commands = new Collection();
+const CommandFiles = fs.readdirSync('./Commands').filter(file => file.endsWith('.js'));
+CommandFiles.forEach( file => {
+    const command = require(`./Commands/${file}`);
+    Bot.commands.set(command.data.name, command);
+});
+
+// Bot ready event (once)
+Bot.once('ready', () => {
     console.log('Bot ready!!!');
 });
 
-bot.on('messageCreate', message => {
-    console.log(message.content);
-    if (message.content.startsWith("!ping")) {
-        message.channel.send("pong!");
+// On interaction creation event
+Bot.on('interactionCreate', async interaction => {
+    if (!interaction.isCommand()) return;
+    if (!Bot.commands.has(interaction.commandName)) return;
+    try {
+        await Bot.commands.get(interaction.commandName).execute(interaction);
+    } catch (err) {
+        console.error(err);
+        await interaction.reply({ content: 'There is an error executing this command!', ephemeral: true});
     }
 })
 
-bot.login('ODc0NzQ4MjE0Mzc5NzA4NDI2.YRLewg.QZ7GcyWvwtMw_9QSDNMQwqSiOgE');
+// Bot login
+Bot.login(Config.Token);

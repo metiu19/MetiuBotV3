@@ -13,7 +13,9 @@ for (const file of commandFiles) {
 
 const rest = new REST({ version: '9' }).setToken(Token);
 
-(async () => {
+const dev = true;
+
+const Guild = async () => {
 	try {
 		console.log('Started refreshing application (/) commands.');
 
@@ -26,4 +28,27 @@ const rest = new REST({ version: '9' }).setToken(Token);
 	} catch (error) {
 		console.error(error);
 	}
-})();
+}
+
+const Global = async () => {
+	try {
+		console.log('Started refreshing application (/) commands.');
+
+		await rest.put(
+			Routes.applicationCommands('874748214379708426'),
+			{ body: [] },
+		);
+
+		console.log('Successfully reloaded application (/) commands.');
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+if (dev) {
+	console.log(`Dev: ${dev}\nUpdating commands only for "Bot Test"`);
+	Guild();
+} else {
+	console.log(`Dev: ${dev}\nUpdating global commands`);
+	Global();
+}

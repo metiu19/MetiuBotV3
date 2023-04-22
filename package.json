@@ -4,6 +4,6 @@
     "@discordjs/rest": "^0.6.0",
     "discord-api-types": "^0.22.0",
     "discord.js": "^13.1.0",
-    "util": "^0.12.4"
+    "util": "^0.12.5"
   }
 }
